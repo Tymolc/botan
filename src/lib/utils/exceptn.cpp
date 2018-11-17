@@ -101,8 +101,12 @@ Invalid_OID::Invalid_OID(const std::string& oid) :
    Decoding_Error("Invalid ASN.1 OID: " + oid)
    {}
 
-Stream_IO_Error::Stream_IO_Error(const std::string& err) :
+IO_Error::IO_Error(const std::string& err) :
    Exception("I/O error: " + err)
+   {}
+
+Runtime_Error::Runtime_Error(const std::string& msg, int err_code) :
+   Exception(msg + " error code " + std::to_string(err_code))
    {}
 
 Self_Test_Failure::Self_Test_Failure(const std::string& err) :

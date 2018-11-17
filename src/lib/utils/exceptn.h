@@ -1,6 +1,6 @@
 /*
 * Exceptions
-* (C) 1999-2009 Jack Lloyd
+* (C) 1999-2009,2018 Jack Lloyd
 *
 * Botan is released under the Simplified BSD License (see license.txt)
 */
@@ -20,10 +20,10 @@ namespace Botan {
 class BOTAN_PUBLIC_API(2,0) Exception : public std::exception
    {
    public:
-      Exception(const char* prefix, const std::string& msg);
-      explicit Exception(const std::string& msg);
       const char* what() const noexcept override { return m_msg.c_str(); }
    protected:
+      explicit Exception(const std::string& msg);
+      Exception(const char* prefix, const std::string& msg);
       Exception(const std::string& msg, const std::exception& e);
    private:
       std::string m_msg;
@@ -205,12 +205,38 @@ class BOTAN_PUBLIC_API(2,0) Invalid_OID final : public Decoding_Error
    };
 
 /**
-* Stream_IO_Error Exception
+* IO_Error Exception
+*
+* Was named Stream_IO_Error until 2.9
 */
-class BOTAN_PUBLIC_API(2,0) Stream_IO_Error final : public Exception
+class BOTAN_PUBLIC_API(2,0) IO_Error final : public Exception
    {
    public:
-      explicit Stream_IO_Error(const std::string& err);
+      explicit IO_Error(const std::string& err);
+   };
+
+typedef IO_Error Stream_IO_Error;
+
+/**
+* Runtime_Error
+*
+* This exception is thrown in the event of an error related to interacting
+* with the operating system.
+*
+* This exception type also (optionally) captures an integer error code eg
+* POSIX errno or Windows GetLastError.
+*/
+class BOTAN_PUBLIC_API(2,9) Runtime_Error : public Exception
+   {
+   public:
+      int error_code() const { return m_error_code; }
+
+      Runtime_Error(const std::string& msg) : Exception(msg) {}
+
+      Runtime_Error(const std::string& msg, int err_code);
+
+   private:
+      int m_error_code;
    };
 
 /**
@@ -224,6 +250,9 @@ class BOTAN_PUBLIC_API(2,0) Self_Test_Failure final : public Internal_Error
 
 /**
 * Not Implemented Exception
+*
+* This is thrown in the situation where a requested operation is
+* logically valid but is not implemented by this version of the library.
 */
 class BOTAN_PUBLIC_API(2,0) Not_Implemented final : public Exception
    {
