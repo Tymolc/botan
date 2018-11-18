@@ -44,6 +44,8 @@ enum class ErrorType {
    EncodingFailure,
    /** Decoding a message or datum failed */
    DecodingFailure,
+   /** A TLS error (error_code will be the alert type) */
+   TLSError,
 };
 
 /**

@@ -28,6 +28,9 @@ class BOTAN_PUBLIC_API(2,0) X509_CRL final : public X509_Object
    public:
       /**
       * This class represents CRL related errors.
+      *
+      * In a future major release this exception type will be removed and
+      * replaced with Decoding_Error
       */
       class BOTAN_PUBLIC_API(2,0) X509_CRL_Error final : public Exception
          {
