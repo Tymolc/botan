@@ -47,8 +47,7 @@ Device_EntropySource::Device_EntropySource(const std::vector<std::string>& fsnam
          either a bug in the application or file descriptor exhaustion.
          */
          if(errno != ENOENT && errno != EACCES)
-            throw IO_Error("Opening OS RNG device failed with errno " +
-                           std::to_string(errno));
+            throw Runtime_Error("Opening OS RNG device failed", errno);
          }
       else
          {

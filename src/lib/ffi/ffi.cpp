@@ -25,6 +25,43 @@ int ffi_error_exception_thrown(const char* func_name, const char* exn, int rc)
    return rc;
    }
 
+namespace {
+
+int ffi_map_error_type(Botan::ErrorType err)
+   {
+   switch(err)
+      {
+      case Botan::ErrorType::SystemError:
+         return BOTAN_FFI_ERROR_SYSTEM_ERROR;
+      case Botan::ErrorType::NotImplemented:
+         return BOTAN_FFI_ERROR_NOT_IMPLEMENTED;
+      case Botan::ErrorType::OutOfMemory:
+         return BOTAN_FFI_ERROR_OUT_OF_MEMORY;
+      case Botan::ErrorType::InternalError:
+         return BOTAN_FFI_ERROR_INTERNAL_ERROR;
+      case Botan::ErrorType::InvalidObjectState:
+         return BOTAN_FFI_ERROR_INVALID_OBJECT_STATE;
+      case Botan::ErrorType::KeyNotSet:
+         return BOTAN_FFI_ERROR_KEY_NOT_SET;
+      case Botan::ErrorType::InvalidArgument:
+      case Botan::ErrorType::InvalidNonceLength:
+         return BOTAN_FFI_ERROR_BAD_PARAMETER;
+
+      case Botan::ErrorType::EncodingFailure:
+      case Botan::ErrorType::DecodingFailure:
+         return BOTAN_FFI_ERROR_INVALID_INPUT;
+
+      case Botan::ErrorType::InvalidKeyLength:
+         return BOTAN_FFI_ERROR_INVALID_KEY_LENGTH;
+      case Botan::ErrorType::LookupError:
+         return BOTAN_FFI_ERROR_NOT_IMPLEMENTED;
+      }
+
+   return BOTAN_FFI_ERROR_UNKNOWN_ERROR;
+   }
+
+}
+
 int ffi_guard_thunk(const char* func_name, std::function<int ()> thunk)
    {
    try
@@ -39,25 +76,9 @@ int ffi_guard_thunk(const char* func_name, std::function<int ()> thunk)
       {
       return ffi_error_exception_thrown(func_name, e.what(), e.error_code());
       }
-   catch(Botan::Lookup_Error& e)
+   catch(Botan::Exception& e)
       {
-      return ffi_error_exception_thrown(func_name, e.what(), BOTAN_FFI_ERROR_NOT_IMPLEMENTED);
-      }
-   catch(Botan::Invalid_Key_Length& e)
-      {
-      return ffi_error_exception_thrown(func_name, e.what(), BOTAN_FFI_ERROR_INVALID_KEY_LENGTH);
-      }
-   catch(Botan::Key_Not_Set& e)
-      {
-      return ffi_error_exception_thrown(func_name, e.what(), BOTAN_FFI_ERROR_KEY_NOT_SET);
-      }
-   catch(Botan::Invalid_Argument& e)
-      {
-      return ffi_error_exception_thrown(func_name, e.what(), BOTAN_FFI_ERROR_BAD_PARAMETER);
-      }
-   catch(Botan::Not_Implemented& e)
-      {
-      return ffi_error_exception_thrown(func_name, e.what(), BOTAN_FFI_ERROR_NOT_IMPLEMENTED);
+      return ffi_error_exception_thrown(func_name, e.what(), ffi_map_error_type(e.error_type()));
       }
    catch(std::exception& e)
       {

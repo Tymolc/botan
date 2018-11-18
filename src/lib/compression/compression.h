@@ -152,7 +152,7 @@ class BOTAN_PUBLIC_API(2,9) Compression_Error : public Exception
                    " failed with return code " + std::to_string(rc))
          {}
 
-      int library_return_code() const { return m_rc; }
+      int error_code() const noexcept override { return m_rc; }
 
    private:
       int m_rc;

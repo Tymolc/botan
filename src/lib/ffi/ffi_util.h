@@ -24,7 +24,7 @@ class BOTAN_UNSTABLE_API FFI_Error final : public Botan::Exception
          m_err_code(err_code)
          {}
 
-      int error_code() const { return m_err_code; }
+      int error_code() const noexcept override { return m_err_code; }
 
    private:
       int m_err_code;
